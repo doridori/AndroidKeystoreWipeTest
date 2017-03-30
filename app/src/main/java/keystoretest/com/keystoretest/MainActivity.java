@@ -3,6 +3,7 @@ package keystoretest.com.keystoretest;
 import android.app.admin.DevicePolicyManager;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         status = (TextView) findViewById(R.id.status);
+        printDeviceDetails();
     }
 
 
@@ -112,5 +114,15 @@ public class MainActivity extends AppCompatActivity {
         } else {
             return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void printDeviceDetails() {
+        TextView deviceInfo = (TextView) findViewById(R.id.deviceInfo);
+
+        StringBuilder b = new StringBuilder();
+        b.append("DEVICE: ").append(Build.MANUFACTURER).append(" ").append(Build.MODEL).append("\n");
+        b.append("OS: ").append(Build.VERSION.RELEASE).append("-").append(Build.VERSION.SDK_INT);
+
+        deviceInfo.setText(b.toString());
     }
 }
