@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -18,22 +20,23 @@ import java.security.GeneralSecurityException;
 public class MainActivity extends AppCompatActivity {
     public static final String ALIAS = "TestKeyAlias";
 
-
     private TextView status;
+    private CheckBox encryptionRequiredCheckBox;
+    boolean encryptionRequired;
+    private Prefs prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        status = (TextView) findViewById(R.id.status);
-        printDeviceDetails();
+        prefs = new Prefs(getApplicationContext());
+        initViews();
+        loadEncryptionRequired();
     }
 
-
-    public void openSettings() {
-        Intent intent =
-                new Intent(DevicePolicyManager.ACTION_SET_NEW_PASSWORD);
-        startActivity(intent);
+    private void loadEncryptionRequired() {
+        encryptionRequired = prefs.isEncryptionRequired();
+        encryptionRequiredCheckBox.setChecked(encryptionRequired);
     }
 
     @Override
@@ -63,8 +66,8 @@ public class MainActivity extends AppCompatActivity {
 
             if (aliasInKeyStore) {
                 //test key can be read
-                new SecretKeyWrapper(this, ALIAS);
-                updateStatus("Key can be read", true);
+                new SecretKeyWrapper(this, ALIAS, encryptionRequiredCheckBox.isChecked());
+                updateStatus("Key can be read EncryptionReq:" + encryptionRequiredCheckBox.isChecked(), true);
             }
         } catch (GeneralSecurityException e) {
             updateStatus(e.getMessage(), false);
@@ -77,8 +80,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void generateClicked(View view) {
         try {
-            SecretKeyWrapper mSecretKeyWrapper = new SecretKeyWrapper(this, ALIAS);
-            updateStatus("Pair generated with alias!", true);
+            SecretKeyWrapper mSecretKeyWrapper = new SecretKeyWrapper(this, ALIAS, encryptionRequiredCheckBox.isChecked());
+            updateStatus("Pair generated with alias! EncryptionReq:" + encryptionRequiredCheckBox.isChecked(), true);
         } catch (GeneralSecurityException e) {
             e.printStackTrace();
             updateStatus(e.getMessage(), false);
@@ -86,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
             updateStatus(e.getMessage(), false);
         }
-
     }
 
     private void updateStatus(String string, boolean good) {
@@ -101,7 +103,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -125,4 +126,24 @@ public class MainActivity extends AppCompatActivity {
 
         deviceInfo.setText(b.toString());
     }
+
+    private void initViews() {
+        status = (TextView) findViewById(R.id.status);
+        encryptionRequiredCheckBox = (CheckBox) findViewById(R.id.generateEncryptedChk);
+        encryptionRequiredCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                prefs.setEncryptionRequired(isChecked);
+            }
+        });
+        printDeviceDetails();
+    }
+
+
+    public void openSettings() {
+        Intent intent =
+                new Intent(DevicePolicyManager.ACTION_SET_NEW_PASSWORD);
+        startActivity(intent);
+    }
+
 }

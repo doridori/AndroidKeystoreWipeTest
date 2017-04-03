@@ -3,7 +3,8 @@
 
     <string name="app_name">KeystoreTest</string>
     <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Open system lock settings</string>
+    <string name="action_settings">sys lock settings</string>
     <string name="generate_button">Generate!</string>
+    <string name="encryption_required_chk">Encryption required</string>
 
 </resources>

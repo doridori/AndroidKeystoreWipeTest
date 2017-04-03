@@ -30,8 +30,7 @@ import javax.security.auth.x500.X500Principal;
  * <p>
  * Not inherently thread safe.
  */
-public class SecretKeyWrapper
-{
+public class SecretKeyWrapper {
 
     private final KeyPair mPair;
     private final Cipher mCipher;
@@ -40,14 +39,13 @@ public class SecretKeyWrapper
      * Create a wrapper using the public/private key pair with the given alias.
      * If no pair with that alias exists, it will be generated.
      */
-    public SecretKeyWrapper(Context context, String alias) throws GeneralSecurityException, IOException
-    {
+    public SecretKeyWrapper(Context context, String alias, boolean encryptionRequired) throws GeneralSecurityException, IOException {
         mCipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 
         final KeyStore keyStore = getKeystore();
 
         if (!keyStore.containsAlias(alias)) {
-            generateKeyPair(context, alias);
+            generateKeyPair(context, alias, encryptionRequired);
         }
 
         // Even if we just generated the key, always read it back to ensure we can read it successfully.
@@ -60,45 +58,33 @@ public class SecretKeyWrapper
      *
      * @return
      */
-    public static boolean isAliasInKeystore(String alias) throws GeneralSecurityException
-    {
+    public static boolean isAliasInKeystore(String alias) throws GeneralSecurityException {
         final KeyStore keyStore = getKeystore();
         return keyStore.containsAlias(alias);
     }
 
-    public static void deleteAlias(String alias) throws GeneralSecurityException
-    {
+    public static void deleteAlias(String alias) throws GeneralSecurityException {
         final KeyStore keyStore = getKeystore();
         boolean aliasExists = keyStore.containsAlias(alias);
         keyStore.deleteEntry(alias);
         boolean aliasExitsAfterDelete = keyStore.containsAlias(alias);
     }
 
-    private static KeyStore getKeystore() throws GeneralSecurityException
-    {
-        try
-        {
+    private static KeyStore getKeystore() throws GeneralSecurityException {
+        try {
             final KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
             keyStore.load(null);
             return keyStore;
-        }
-        catch (KeyStoreException e)
-        {
+        } catch (KeyStoreException e) {
             e.printStackTrace();
             throw new GeneralSecurityException(e);
-        }
-        catch (CertificateException e)
-        {
+        } catch (CertificateException e) {
             e.printStackTrace();
             throw new GeneralSecurityException(e);
-        }
-        catch (NoSuchAlgorithmException e)
-        {
+        } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
             throw new GeneralSecurityException(e);
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
             throw new GeneralSecurityException(e);
         }
@@ -107,22 +93,27 @@ public class SecretKeyWrapper
     /**
      * @param context
      * @param alias
+     * @param encryptionRequired
      * @throws java.security.GeneralSecurityException
      */
-    private static void generateKeyPair(Context context, String alias) throws GeneralSecurityException
-    {
+    private static void generateKeyPair(Context context, String alias, boolean encryptionRequired) throws GeneralSecurityException {
         final Calendar start = new GregorianCalendar();
         final Calendar end = new GregorianCalendar();
         end.add(Calendar.YEAR, 100);
 
-        final KeyPairGeneratorSpec spec = new KeyPairGeneratorSpec.Builder(context)
+
+        KeyPairGeneratorSpec.Builder kpBuilder = new KeyPairGeneratorSpec.Builder(context)
                 .setAlias(alias)
                 .setSubject(new X500Principal("CN=" + alias))
                 .setSerialNumber(BigInteger.ONE)
                 .setStartDate(start.getTime())
-                .setEndDate(end.getTime())
-                //.setEncryptionRequired()
-                .build();
+                .setEndDate(end.getTime());
+
+        if (encryptionRequired) {
+            kpBuilder.setEncryptionRequired();
+        }
+
+        final KeyPairGeneratorSpec spec = kpBuilder.build();
 
         final KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA", "AndroidKeyStore");
         gen.initialize(spec);
@@ -136,10 +127,9 @@ public class SecretKeyWrapper
      * {@link javax.crypto.SecretKey}.
      *
      * @return a wrapped version of the given {@link javax.crypto.SecretKey} that can be
-     *         safely stored on untrusted storage.
+     * safely stored on untrusted storage.
      */
-    public byte[] wrap(SecretKey key) throws GeneralSecurityException
-    {
+    public byte[] wrap(SecretKey key) throws GeneralSecurityException {
         mCipher.init(Cipher.WRAP_MODE, mPair.getPublic());
         return mCipher.wrap(key);
     }
@@ -149,10 +139,9 @@ public class SecretKeyWrapper
      * wrapper.
      *
      * @param blob a wrapped {@link javax.crypto.SecretKey} as previously returned by
-     *            {@link #wrap(javax.crypto.SecretKey)}.
+     *             {@link #wrap(javax.crypto.SecretKey)}.
      */
-    public SecretKey unwrap(byte[] blob) throws GeneralSecurityException
-    {
+    public SecretKey unwrap(byte[] blob) throws GeneralSecurityException {
         mCipher.init(Cipher.UNWRAP_MODE, mPair.getPrivate());
         return (SecretKey) mCipher.unwrap(blob, "AES", Cipher.SECRET_KEY);
     }
