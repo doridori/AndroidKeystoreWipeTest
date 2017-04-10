@@ -6,7 +6,7 @@ Accompanies [a blog post I have written](http://systemdotrun.blogspot.co.uk/2015
 
 # Steps to Test keystore behaviour
 
-Note to switch lock type back to NONE, you'll have to remove device-encryption, any user installed certificates i.e Charles Proxy root cert, and remove any device admins. Also once a keypair has been generated the system will not let you revert to NONE (regardless of if the KeyStore is encrypted or not) unless the app has been deleted / the pair removed.
+Note to switch lock type back to `NONE`, you'll have to remove device-encryption, any user installed certificates i.e Charles Proxy root cert, and remove any device admins. Also once a keypair has been generated the system will not let you revert to `NONE` (regardless of if the KeyStore is encrypted or not) unless the app has been deleted / the pair removed.
 
 1. Set device lock to none
 2. Install this app
