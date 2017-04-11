@@ -4,8 +4,8 @@ Simple app to test android keystore wiping
 Accompanies [a blog post I have written](http://systemdotrun.blogspot.co.uk/2015/02/android-security-forgetful-keystore.html)
 
 
-## Steps to Test keystore behaviour
 
+## Steps to Test keystore behaviour
 1. Set device lock to none
 2. Install this app
 3. Generate Key
@@ -13,13 +13,10 @@ Accompanies [a blog post I have written](http://systemdotrun.blogspot.co.uk/2015
 5. Change System lock type - Note which lock type going from and to
 6. Open app and record findings i.e T = the key can be read (green bg) or **F** if the key cannot be loaded (red bg).
 
-
-Repeat steps 3 to 6 switching between different device lock types. Record them in using the markdown template below.
-
-Send a PR or create issue with details on https://github.com/doridori/doridori.github.io so that the test results can displayed on the blog post.
-
+Repeat steps 3 to 6 switching between different device lock types. 
 
 ## Blank table
+Record them in using this markdown template. Please send a PR or create issue with details on https://github.com/doridori/doridori.github.io so that the test results can displayed on the blog post.
 
 | to ↓        from > | NONE | PIN | PASS | PATTERN |
 |--------------------|------|-----|------|---------|
