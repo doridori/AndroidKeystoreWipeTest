@@ -1,5 +1,5 @@
 # AndroidKeystoreWipeTest
-Simple app to test android keystore wiping
+Simple app to test android keystore wiping (for the now deprecated `KeyPairGeneratorSpec` approach)
 
 Accompanies [a blog post I have written](http://systemdotrun.blogspot.co.uk/2015/02/android-security-forgetful-keystore.html)
 
