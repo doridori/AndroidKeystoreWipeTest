@@ -37,6 +37,13 @@
         android:onClick="generateClicked"
         android:text="@string/generate_button" />
 
+    <Button
+        android:id="@+id/deleteKeyButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="deleteKeyClicked"
+        android:text="@string/delete_key_button" />
+
     <CheckBox
         android:id="@+id/generateEncryptedChk"
         android:layout_width="match_parent"
