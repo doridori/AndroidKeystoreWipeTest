@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox encryptionRequiredCheckBox;
     boolean encryptionRequired;
     private Prefs prefs;
-    private SecretKeyWrapper mSecretKeyWrapper;
+    private SecretKeyWrapper secretKeyWrapper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void generateClicked(View view) {
         try {
-            mSecretKeyWrapper = new SecretKeyWrapper(this, ALIAS, encryptionRequiredCheckBox.isChecked());
+            secretKeyWrapper = new SecretKeyWrapper(this, ALIAS, encryptionRequiredCheckBox.isChecked());
             updateStatus("Pair generated with alias! EncryptionReq:" + encryptionRequiredCheckBox.isChecked(), true);
         } catch (GeneralSecurityException e) {
             e.printStackTrace();
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void deleteKeyClicked(View view) {
         try {
-            if (!mSecretKeyWrapper.deleteAlias(ALIAS)) {
+            if (!secretKeyWrapper.deleteAlias(ALIAS)) {
                 updateStatus("Alias deleted", false);
             }
         } catch (GeneralSecurityException e) {
