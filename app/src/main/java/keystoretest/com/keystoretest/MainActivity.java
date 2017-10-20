@@ -94,9 +94,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void deleteKeyClicked(View view) {
         try {
-            if (!secretKeyWrapper.deleteAlias(ALIAS)) {
-                updateStatus("Alias deleted", false);
-            }
+            secretKeyWrapper.deleteAlias(ALIAS);
+            updateStatus("Alias deleted", false);
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+            updateStatus(e.getMessage(), false);
         } catch (GeneralSecurityException e) {
             e.printStackTrace();
             updateStatus(e.getMessage(), false);

@@ -69,12 +69,13 @@ public class SecretKeyWrapper {
      * @return true if the alias still exists or false if alias was removed successfully
      * @throws GeneralSecurityException
      */
-    public static boolean deleteAlias(String alias) throws GeneralSecurityException {
+    public static void deleteAlias(String alias) throws GeneralSecurityException, IllegalStateException {
         final KeyStore keyStore = getKeystore();
         boolean aliasExists = keyStore.containsAlias(alias);
         keyStore.deleteEntry(alias);
-        boolean aliasExitsAfterDelete = keyStore.containsAlias(alias);
-        return aliasExitsAfterDelete;
+        if(keyStore.containsAlias(alias)) {
+            throw new IllegalStateException("Failed to delete key");
+        }
     }
 
     private static KeyStore getKeystore() throws GeneralSecurityException {
