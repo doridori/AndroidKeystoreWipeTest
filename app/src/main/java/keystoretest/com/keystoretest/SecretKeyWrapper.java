@@ -21,8 +21,8 @@ import javax.crypto.SecretKey;
 import javax.security.auth.x500.X500Principal;
 
 /**
- * Wraps {@link javax.crypto.SecretKey} instances using a public/private key pair stored in
- * the platform {@link java.security.KeyStore}. This allows us to protect symmetric keys with
+ * Wraps {@link SecretKey} instances using a public/private key pair stored in
+ * the platform {@link KeyStore}. This allows us to protect symmetric keys with
  * hardware-backed crypto, if provided by the device.
  * <p>
  * See <a href="http://en.wikipedia.org/wiki/Key_Wrap">key wrapping</a> for more
@@ -63,11 +63,19 @@ public class SecretKeyWrapper {
         return keyStore.containsAlias(alias);
     }
 
-    public static void deleteAlias(String alias) throws GeneralSecurityException {
+    /**
+     * Delete the specified alias in the keystore
+     * @param alias
+     * @return true if the alias still exists or false if alias was removed successfully
+     * @throws GeneralSecurityException
+     */
+    public static void deleteAlias(String alias) throws GeneralSecurityException, IllegalStateException {
         final KeyStore keyStore = getKeystore();
         boolean aliasExists = keyStore.containsAlias(alias);
         keyStore.deleteEntry(alias);
-        boolean aliasExitsAfterDelete = keyStore.containsAlias(alias);
+        if(keyStore.containsAlias(alias)) {
+            throw new IllegalStateException("Failed to delete key");
+        }
     }
 
     private static KeyStore getKeystore() throws GeneralSecurityException {
@@ -94,7 +102,7 @@ public class SecretKeyWrapper {
      * @param context
      * @param alias
      * @param encryptionRequired
-     * @throws java.security.GeneralSecurityException
+     * @throws GeneralSecurityException
      */
     private static void generateKeyPair(Context context, String alias, boolean encryptionRequired) throws GeneralSecurityException {
         final Calendar start = new GregorianCalendar();
@@ -122,11 +130,11 @@ public class SecretKeyWrapper {
     }
 
     /**
-     * Wrap a {@link javax.crypto.SecretKey} using the public key assigned to this wrapper.
+     * Wrap a {@link SecretKey} using the public key assigned to this wrapper.
      * Use {@link #unwrap(byte[])} to later recover the original
-     * {@link javax.crypto.SecretKey}.
+     * {@link SecretKey}.
      *
-     * @return a wrapped version of the given {@link javax.crypto.SecretKey} that can be
+     * @return a wrapped version of the given {@link SecretKey} that can be
      * safely stored on untrusted storage.
      */
     public byte[] wrap(SecretKey key) throws GeneralSecurityException {
@@ -135,11 +143,11 @@ public class SecretKeyWrapper {
     }
 
     /**
-     * Unwrap a {@link javax.crypto.SecretKey} using the private key assigned to this
+     * Unwrap a {@link SecretKey} using the private key assigned to this
      * wrapper.
      *
-     * @param blob a wrapped {@link javax.crypto.SecretKey} as previously returned by
-     *             {@link #wrap(javax.crypto.SecretKey)}.
+     * @param blob a wrapped {@link SecretKey} as previously returned by
+     *             {@link #wrap(SecretKey)}.
      */
     public SecretKey unwrap(byte[] blob) throws GeneralSecurityException {
         mCipher.init(Cipher.UNWRAP_MODE, mPair.getPrivate());

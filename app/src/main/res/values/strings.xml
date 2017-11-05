@@ -6,5 +6,6 @@
     <string name="action_settings">sys lock settings</string>
     <string name="generate_button">Generate!</string>
     <string name="encryption_required_chk">Encryption required</string>
+    <string name="delete_key_button">Delete Alias</string>
 
 </resources>
